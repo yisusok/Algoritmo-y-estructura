@@ -1,6 +1,6 @@
 class Stack:
     def __init__(self):
-        self.__elements=[] #el doble guion bajo oculta la informacion para el usuario para no modificar el codigo fuente
+        self.__elements=[] 
     
     def push(self,element):
         self.__elements.append(element)
@@ -32,19 +32,19 @@ class Stack:
 # pila.push(31)
 # pila.push(10)
 
-# # print(pila.__elements)
+# print(pila.__elements)
 # print(pila.on_top())
 # print(pila.size())
 # print()
-# # print(pila.pop())
-# # print(pila.pop())
-# # print(pila.pop())
-# # print(pila.pop())
-# # print(pila.pop())
+# print(pila.pop())
+# print(pila.pop())
+# print(pila.pop())
+# print(pila.pop())
+# print(pila.pop())
 
 
 
-# # para mostrar
+# para mostrar
 
 # data=pila.pop()
 # while pila.size()>0:
