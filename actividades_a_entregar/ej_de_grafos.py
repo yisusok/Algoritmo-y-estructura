@@ -15,124 +15,50 @@
 # Smart Tv.
 
 
-
-from cola import Queue
-
-from heap import HeapMax,HeapMin
+from grafo import Graph
 
 
-from pila import Stack
+grafo = Graph(dirigido=False)
 
-
-class Graph:
-    def __init__(self):
-        self.vertices = {}
-    
-    def add_vertex(self, vertex):
-        if vertex not in self.vertices:
-            self.vertices[vertex] = []
-    
-    def add_edge(self, vertex1, vertex2, weight):
-        self.add_vertex(vertex1)
-        self.add_vertex(vertex2)
-        self.vertices[vertex1].append((vertex2, weight))
-        self.vertices[vertex2].append((vertex1, weight))
-
-    def min_spanning_tree(self):
-        start_vertex = next(iter(self.vertices))
-        visited = set()
-        edges = HeapMin()
-        total_weight = 0
-
-        for to, weight in self.vertices[start_vertex]:
-            edges.add((weight, start_vertex, to))
-
-        visited.add(start_vertex)
-
-        while edges.elements:
-            weight, frm, to = edges.remove()
-            if to not in visited:
-                visited.add(to)
-                total_weight += weight
-                for next_to, next_weight in self.vertices[to]:
-                    if next_to not in visited:
-                        edges.add((next_weight, to, next_to))
-
-        return total_weight
-
-    def dijkstra(self, start, end):
-        queue = HeapMin()
-        queue.add((0, start))
-        distances = {vertex: float('infinity') for vertex in self.vertices}
-        distances[start] = 0
-        previous_vertices = {vertex: None for vertex in self.vertices}
-
-        while queue.elements:
-            current_distance, current_vertex = queue.remove()
-
-            if current_distance > distances[current_vertex]:
-                continue
-
-            for neighbor, weight in self.vertices[current_vertex]:
-                distance = current_distance + weight
-
-                if distance < distances[neighbor]:
-                    distances[neighbor] = distance
-                    previous_vertices[neighbor] = current_vertex
-                    queue.add((distance, neighbor))
-
-        path = []
-        current_vertex = end
-        while current_vertex is not None:
-            path.append(current_vertex)
-            current_vertex = previous_vertices[current_vertex]
-
-        return path[::-1], distances[end]
-
-
-# Creación del grafo
-house_graph = Graph()
-
-# Agregar vértices (ambientes)
-environments = ["cocina", "comedor", "cochera", "quincho", "baño 1", 
+habitaciones = ["cocina", "comedor", "cochera", "quincho", "baño 1", 
                 "baño 2", "habitación 1", "habitación 2", "sala de estar", 
                 "terraza", "patio"]
 
-for env in environments:
-    house_graph.add_vertex(env)
+for habitacion in habitaciones:
+    grafo.insert_vertice(habitacion)
 
-# Agregar aristas (distancias en metros)
-edges = [
-    ("cocina", "comedor", 5),
-    ("cocina", "cochera", 10),
-    ("cocina", "baño 1", 3),
-    ("comedor", "quincho", 8),
-    ("comedor", "sala de estar", 12),
-    ("baño 1", "baño 2", 2),
-    ("habitación 1", "sala de estar", 7),
-    ("habitación 2", "terraza", 4),
-    ("sala de estar", "patio", 6),
-    ("quincho", "cochera", 15),
-]
+grafo.insert_arista("cocina", "comedor", 5)
+grafo.insert_arista("cocina", "baño 1", 8)
+grafo.insert_arista("cocina", "habitacion 1", 12)
+grafo.insert_arista("comedor", "sala de estar", 7)
+grafo.insert_arista("comedor", "quincho", 15)
+grafo.insert_arista("comedor", "baño 2", 6)
+grafo.insert_arista("cochera", "quincho", 10)
+grafo.insert_arista("cochera", "patio", 20)
+grafo.insert_arista("cochera", "terraza", 25)
+grafo.insert_arista("baño 1", "habitacion 1", 3)
+grafo.insert_arista("baño 1", "habitacion 2", 10)
+grafo.insert_arista("baño 1", "sala de estar", 9)
+grafo.insert_arista("quincho", "terraza", 4)
+grafo.insert_arista("terraza", "patio", 8)
+grafo.insert_arista("patio", "sala de estar", 18)
+grafo.insert_arista("habitacion 1", "habitacion 2", 5)
+grafo.insert_arista("habitacion 2", "sala de estar", 10)
 
-for edge in edges:
-    house_graph.add_edge(*edge)
-
-# Obtener el árbol de expansión mínima
-total_cable_length = house_graph.min_spanning_tree()
-print(f"Total de metros de cables necesarios para conectar todos los ambientes: {total_cable_length}")
-
-# Determinar el camino más corto desde habitación 1 hasta sala de estar
-shortest_path, cable_length = house_graph.dijkstra("habitación 1", "sala de estar")
-print(f"Camino más corto de habitación 1 a sala de estar: {shortest_path} con {cable_length} metros de cable de red.")
+arbol_minimo = grafo.kruskal("cocina")
+print("Árbol de expansión mínima:")
+print("Contenido de arbol_minimo:", arbol_minimo)
 
 
 
 
-
-
-
-
+camino_corto = grafo.dijkstra("Habitación 1")
+print("Camino más corto desde Habitación 1 hasta Sala de Estar:")
+while camino_corto.size() > 0:
+    nodo = camino_corto.pop()
+    print(nodo[1][0])
+    if nodo[1][0] == "sala de estar":
+        break
 
 # 15. Se requiere implementar un grafo para almacenar las siete maravillas arquitectónicas moder-
 # nas y naturales del mundo, para lo cual se deben tener en cuenta las siguientes actividades:
@@ -145,3 +71,84 @@ print(f"Camino más corto de habitación 1 a sala de estar: {shortest_path} con 
 # d. determinar si existen países que dispongan de maravillas arquitectónicas y naturales;
 # e. determinar si algún país tiene más de una maravilla del mismo tipo;
 # f. deberá utilizar un grafo no dirigido.
+
+
+
+maravillas_grafo = Graph(dirigido=False)
+
+
+maravillas_arquitectonicas = [
+    ("Chichen Itza", ["Mexico"], "arquitectonica"),
+    ("Cristo Redentor", ["Brasil"], "arquitectonica"),
+    ("Coliseo Romano", ["Italia"], "arquitectonica"),
+    ("Machu Picchu", ["Peru"], "arquitectonica")
+]
+
+maravillas_naturales = [
+    ("Gran Barrera de Coral", ["Australia"], "natural"),
+    ("Monte Everest", ["Nepal", "China"], "natural"),
+    ("Selva Amazónica", ["Brasil"], "natural")
+]
+
+
+for maravilla in maravillas_arquitectonicas:
+    maravillas_grafo.insert_vertice(maravilla[0])
+
+
+for maravilla in maravillas_naturales:
+    maravillas_grafo.insert_vertice(maravilla[0])
+
+
+maravillas_grafo.insert_arista("Chichen Itza", "Cristo Redentor", 12000)
+maravillas_grafo.insert_arista("Chichen Itza", "Coliseo Romano", 10000)
+maravillas_grafo.insert_arista("Chichen Itza", "Machu Picchu", 3500)
+maravillas_grafo.insert_arista("Cristo Redentor", "Coliseo Romano", 15000)
+maravillas_grafo.insert_arista("Cristo Redentor", "Machu Picchu", 5000)
+maravillas_grafo.insert_arista("Coliseo Romano", "Machu Picchu", 11000)
+
+
+maravillas_grafo.insert_arista("Gran Barrera de Coral", "Monte Everest", 1500)
+maravillas_grafo.insert_arista("Gran Barrera de Coral", "Selva Amazónica", 2000)
+maravillas_grafo.insert_arista("Monte Everest", "Selva Amazónica", 5000)
+
+
+arbol_minimo_arquitectonicas = maravillas_grafo.kruskal("Chichen Itza")
+print("Árbol de expansión mínima para maravillas arquitectónicas:")
+print(arbol_minimo_arquitectonicas)
+
+
+arbol_minimo_naturales = maravillas_grafo.kruskal("Gran Barrera de Coral")
+print("Árbol de expansión mínima para maravillas naturales:")
+print(arbol_minimo_naturales)
+
+
+paises_arquitectonicos = set()
+paises_naturales = set()
+
+for maravilla, paises, tipo in maravillas_arquitectonicas:
+    paises_arquitectonicos.update(paises)
+
+for maravilla, paises, tipo in maravillas_naturales:
+    paises_naturales.update(paises)
+
+paises_comunes = paises_arquitectonicos.intersection(paises_naturales)
+print("Países con maravillas arquitectónicas y naturales:", paises_comunes)
+
+paises_multiples = {}
+
+for maravilla, paises, tipo in maravillas_arquitectonicas:
+    for pais in paises:
+        if pais in paises_multiples:
+            paises_multiples[pais] += 1
+        else:
+            paises_multiples[pais] = 1
+
+for maravilla, paises, tipo in maravillas_naturales:
+    for pais in paises:
+        if pais in paises_multiples:
+            paises_multiples[pais] += 1
+        else:
+            paises_multiples[pais] = 1
+
+paises_con_multiples_maravillas = {pais: count for pais, count in paises_multiples.items() if count > 1}
+print("Países con más de una maravilla:", paises_con_multiples_maravillas)
